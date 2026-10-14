@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System (Local Storage)</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --edit-color: #f59e0b;
+            --edit-hover: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .main-layout {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-cancel {
+            background-color: #9ca3af;
+            color: white;
+            width: 100%;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit {
+            background-color: var(--edit-color);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: var(--edit-hover);
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Student Management System</h1>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar: Add / Edit Form -->
+            <div class="card">
+                <h2 id="form-title">Add New Student</h2>
+                <form id="student-form">
+                    <input type="hidden" id="student-id">
+                    
+                    <div class="form-group">
+                        <label for="roll-number">Roll Number *</label>
+                        <input type="text" id="roll-number" required placeholder="e.g., STU101">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="full-name">Full Name *</label>
+                        <input type="text" id="full-name" required placeholder="e.g., John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="class-grade">Class / Grade *</label>
+                        <input type="text" id="class-grade" required placeholder="e.g., Grade 10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" required min="1" max="100" placeholder="e.g., 15">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="e.g., 9876543210">
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submit-btn">Save Student</button>
+                    <button type="button" class="btn-cancel" id="cancel-btn">Cancel Edit</button>
+                </form>
+            </div>
+
+            <!-- Main Content Area: Search and Table -->
+            <div>
+                <input type="text" id="search-bar" class="search-box" placeholder="🔍 Search students by name, roll number, or class...">
+                
+                <div class="table-responsive">
+                    <table id="student-table">
+                        <thead>
+                            <tr>
+                                <th>Roll No.</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Age</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-list">
+                            <!-- Injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const studentForm = document.getElementById('student-form');
+        const studentIdInput = document.getElementById('student-id');
+        const rollNumberInput = document.getElementById('roll-number');
+        const fullNameInput = document.getElementById('full-name');
+        const classGradeInput = document.getElementById('class-grade');
+        const ageInput = document.getElementById('age');
+        const phoneInput = document.getElementById('phone');
+        
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const searchBar = document.getElementById('search-bar');
+        const studentList = document.getElementById('student-list');
+
+        // Application State (Initialize from localStorage)
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+
+        // App Initialisation / Render Data
+        function renderStudents(filteredStudents = students) {
+            studentList.innerHTML = '';
+
+            if (filteredStudents.length === 0) {
+                studentList.innerHTML = `<tr><td colspan="6" class="no-data">No student records found.</td></tr>`;
+                return;
+            }
+
+            filteredStudents.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${student.rollNumber}</strong></td>
+                    <td>${student.fullName}</td>
+                    <td>${student.classGrade}</td>
+                    <td>${student.age}</td>
+                    <td>${student.phone || '-'}</td>
+                    <td class="actions-cell">
+                        <button class="btn-edit" onclick="editStudent('${student.id}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteStudent('${student.id}')">Delete</button>
+                    </td>
+                `;
+                studentList.appendChild(row);
+            });
+        }
+
+        // Save Data to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('students', JSON.stringify(students));
+            renderStudents();
+        }
+
+        // Add or Update Form Handler
+        studentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const id = studentIdInput.value;
+            const rollNumber = rollNumberInput.value.trim();
+            const fullName = fullNameInput.value.trim();
